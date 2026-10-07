@@ -11,7 +11,7 @@ Starter repo: https://github.com/SETAPESU26/08_helicopter
 - screenshots/ - code before and after each task
 - chat_history.pdf - full AI chat history
 
-Chat link: PASTE-YOUR-SHARE-LINK-HERE
+Chat link: https://claude.ai/share/ff4fcb72-403b-4819-af2e-7ca7c5a72a24
 
 ## Tasks
 1. Fixed movement bug: added a max speed and a bottom boundary check
