@@ -11,6 +11,8 @@ COLOR_BG = (140, 200, 230)
 COLOR_HELI = (60, 60, 70)
 COLOR_OBSTACLE = (70, 150, 80)
 COLOR_TEXT = (20, 20, 20)
+COLOR_SHIELD_FILL = (120, 220, 255, 70)     # translucent (RGBA)
+COLOR_SHIELD_EDGE = (40, 140, 255)
 
 
 def draw_scene(surface, helicopter, obstacles):
@@ -19,6 +21,17 @@ def draw_scene(surface, helicopter, obstacles):
         pygame.draw.rect(surface, COLOR_OBSTACLE, obstacle.get_top_rect())
         pygame.draw.rect(surface, COLOR_OBSTACLE, obstacle.get_bottom_rect())
     pygame.draw.rect(surface, COLOR_HELI, helicopter.get_rect(), border_radius=4)
+
+
+def draw_shield(surface, helicopter):
+    """Draw a translucent bubble around the helicopter."""
+    radius = int(max(helicopter.width, helicopter.height) / 2 + 10)
+    size = radius * 2 + 4
+    bubble = pygame.Surface((size, size), pygame.SRCALPHA)
+    center = (size // 2, size // 2)
+    pygame.draw.circle(bubble, COLOR_SHIELD_FILL, center, radius)
+    pygame.draw.circle(bubble, COLOR_SHIELD_EDGE, center, radius, width=3)
+    surface.blit(bubble, (int(helicopter.x) - size // 2, int(helicopter.y) - size // 2))
 
 
 def draw_text(surface, font, text, pos, color=COLOR_TEXT):
