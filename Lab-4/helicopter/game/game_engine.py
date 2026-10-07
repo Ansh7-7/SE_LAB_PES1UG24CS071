@@ -4,6 +4,9 @@ GameEngine: owns the helicopter and all obstacles.
 Task 2: hitting the top or bottom wall of an obstacle ends the game
 with a game over message. Flying through the gap is always safe.
 Pressing R on the game over screen restarts.
+
+Task 3: a distance score goes up while playing, is shown on screen
+and on the game over screen, and resets to 0 on restart.
 """
 
 import random
@@ -18,6 +21,7 @@ SPAWN_INTERVAL_FRAMES = 90
 GAP_HEIGHT = 150
 WALL_WIDTH = 60
 SCROLL_SPEED = 3
+PIXELS_PER_DISTANCE_UNIT = 10   # 10 scrolled pixels = 1 point of distance
 
 
 class GameEngine:
@@ -30,6 +34,12 @@ class GameEngine:
         self.obstacles = []
         self.frames_until_spawn = 0
         self.game_over = False
+        self.distance_pixels = 0
+
+    @property
+    def distance(self):
+        """Distance score shown to the player."""
+        return self.distance_pixels // PIXELS_PER_DISTANCE_UNIT
 
     def _spawn_obstacle(self):
         margin = 60
@@ -61,7 +71,7 @@ class GameEngine:
 
     def update(self):
         if self.game_over:
-            return  # freeze everything until restart
+            return  # freeze everything (including the score) until restart
 
         self.helicopter.update(HEIGHT)
 
@@ -74,12 +84,21 @@ class GameEngine:
             obstacle.update()
         self.obstacles = [o for o in self.obstacles if not o.is_off_screen()]
 
+        # The world scrolls SCROLL_SPEED pixels per frame, so that's how far we flew
+        self.distance_pixels += SCROLL_SPEED
+
         if self._check_collisions():
             self.game_over = True
 
     def draw(self, surface, font):
         from game import renderer
         renderer.draw_scene(surface, self.helicopter, self.obstacles)
+        renderer.draw_text(surface, font, f"Distance: {self.distance}", (10, 10))
 
         if self.game_over:
             renderer.draw_banner(surface, font, "GAME OVER - Press R to restart")
+            # Final score on its own line, centered just below the banner
+            line = f"Final distance: {self.distance}"
+            text_w, text_h = font.size(line)
+            pos = ((surface.get_width() - text_w) // 2, surface.get_height() // 2 + text_h)
+            renderer.draw_text(surface, font, line, pos)
